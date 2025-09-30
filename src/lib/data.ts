@@ -60,4 +60,4 @@ export const teachers: Teacher[] = [
 ]
 
 export const classes = ['XII RPL 1', 'XII RPL 2', 'XI TKJ 1', 'XI TKJ 2', 'X MM 1', 'X MM 2', 'X MM 3'];
-export const majors = ['Rekayasa Perangkat Lunak', 'Teknik Komputer & Jaringan', 'Multimedia'];
+export const majors = ['OTKP', 'BDP', 'AKL', 'RPL', 'IPS', 'IPA'];
