@@ -3,14 +3,14 @@ import { ClassMajorClient } from "@/components/dashboard/data/kelas/class-major-
 import { classes, majors } from "@/lib/data";
 
 const classData = [
-    { id: '1', name: 'X', major: 'OTKP' },
-    { id: '2', name: 'X', major: 'BDP' },
-    { id: '3', name: 'X', major: 'AKL' },
-    { id: '4', name: 'X', major: 'RPL' },
-    { id: '5', name: 'XI', major: 'OTKP' },
-    { id: '6', name: 'XI', major: 'BDP' },
-    { id: '7', name: 'XI', major: 'AKL' },
-    { id: '8', name: 'XI', major: 'RPL' },
+    { id: '1', name: 'X', major: 'TKJ 1' },
+    { id: '2', name: 'X', major: 'TKJ 2' },
+    { id: '3', name: 'XI', major: 'TKJ 1' },
+    { id: '4', name: 'XI', major: 'TKJ 2' },
+    { id: '5', name: 'XI', major: 'TKJ 3' },
+    { id: '6', name: 'XII', major: 'TKJ 1' },
+    { id: '7', name: 'XII', major: 'TKJ 2' },
+  
 ];
 
 export default function DataKelasPage() {

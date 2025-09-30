@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useMemo, type FC } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import {
   Card,
   CardContent,
@@ -34,9 +37,15 @@ import {
   DialogDescription,
   DialogFooter,
   DialogClose,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
 import {
   FileUp,
   PlusCircle,
@@ -44,8 +53,19 @@ import {
   RefreshCw,
   Edit,
   Trash2,
+  Upload,
 } from "lucide-react";
 import type { Student } from "@/lib/types";
+import { useToast } from "@/hooks/use-toast";
+
+const studentSchema = z.object({
+    name: z.string().min(1, "Nama tidak boleh kosong"),
+    nis: z.string().min(1, "NIS tidak boleh kosong"),
+    class: z.string().min(1, "Kelas harus dipilih"),
+    gender: z.enum(["L", "P"], { required_error: "Jenis kelamin harus dipilih" }),
+    status: z.enum(["Aktif", "Tidak Aktif"], { required_error: "Status harus dipilih" }),
+});
+
 
 const StatCard: FC<{ title: string; value: string | number; }> = ({ title, value }) => (
     <Card className="shadow">
@@ -68,6 +88,23 @@ export function StudentDataClient({
   const [classFilter, setClassFilter] = useState("Semua Kelas");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
+
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [editingStudent, setEditingStudent] = useState<Student | null>(null);
+  
+  const { toast } = useToast();
+
+  const form = useForm<z.infer<typeof studentSchema>>({
+    resolver: zodResolver(studentSchema),
+    defaultValues: {
+      name: "",
+      nis: "",
+      class: undefined,
+      gender: undefined,
+      status: "Aktif",
+    }
+  });
 
   const filteredStudents = useMemo(() => {
     return students.filter((student) => {
@@ -96,17 +133,60 @@ export function StudentDataClient({
   const confirmDelete = () => {
     if (studentToDelete) {
       setStudents(students.filter((s) => s.id !== studentToDelete.id));
+      toast({ title: "Sukses", description: `Data siswa "${studentToDelete.name}" berhasil dihapus.` });
       setIsDeleteDialogOpen(false);
       setStudentToDelete(null);
     }
   };
+
+  const openFormDialog = (student: Student | null) => {
+    setEditingStudent(student);
+    if (student) {
+        form.reset(student);
+    } else {
+        form.reset({
+            name: "",
+            nis: "",
+            class: undefined,
+            gender: undefined,
+            status: "Aktif",
+        });
+    }
+    setIsFormDialogOpen(true);
+  };
+  
+  const onSubmit = (values: z.infer<typeof studentSchema>) => {
+    if (editingStudent) {
+      setStudents(students.map(s => s.id === editingStudent.id ? { ...s, ...values } : s));
+      toast({ title: "Sukses", description: "Data siswa berhasil diperbarui." });
+    } else {
+      const newStudent: Student = {
+        id: (students.length + 1 + Math.random()).toString(),
+        avatar: `student-avatar-${(students.length % 5) + 1}`,
+        ...values,
+      };
+      setStudents([newStudent, ...students]);
+      toast({ title: "Sukses", description: "Siswa baru berhasil ditambahkan." });
+    }
+    setIsFormDialogOpen(false);
+    setEditingStudent(null);
+  };
+
+  const handleExport = () => {
+    toast({ title: "Fungsi Belum Tersedia", description: "Fitur export ke Excel sedang dalam pengembangan." });
+  };
+  
+  const handleImport = () => {
+    setIsImportDialogOpen(false);
+    toast({ title: "Import Berhasil (Simulasi)", description: "Data siswa dari file Excel telah berhasil diimpor." });
+  }
   
   return (
     <div className="space-y-6">
       <Card>
         <CardContent className="p-4 grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
           <div className="md:col-span-2">
-            <Label htmlFor="search-student">Cari Siswa</Label>
+            <label htmlFor="search-student" className="text-sm font-medium">Cari Siswa</label>
             <div className="relative mt-1">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -119,7 +199,7 @@ export function StudentDataClient({
             </div>
           </div>
           <div>
-            <Label htmlFor="class-filter">Filter Kelas</Label>
+            <label htmlFor="class-filter" className="text-sm font-medium">Filter Kelas</label>
             <Select
               value={classFilter}
               onValueChange={setClassFilter}
@@ -137,14 +217,20 @@ export function StudentDataClient({
               </SelectContent>
             </Select>
           </div>
-          <Button>
-            <PlusCircle className="mr-2" />
-            Tambah Siswa
-          </Button>
-          <Button variant="outline">
-            <FileUp className="mr-2" />
-            Export Excel
-          </Button>
+          <div className="grid grid-cols-2 gap-2 md:col-span-2">
+            <Button onClick={() => openFormDialog(null)} className="w-full">
+              <PlusCircle className="mr-2" />
+              Tambah
+            </Button>
+            <Button variant="outline" onClick={() => setIsImportDialogOpen(true)}>
+                <Upload className="mr-2" />
+                Import
+            </Button>
+            <Button variant="outline" onClick={handleExport} className="col-span-2">
+              <FileUp className="mr-2" />
+              Export Excel
+            </Button>
+          </div>
         </CardContent>
       </Card>
       
@@ -199,7 +285,7 @@ export function StudentDataClient({
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right space-x-2">
-                        <Button variant="outline" size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90">
+                        <Button variant="outline" size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90" onClick={() => openFormDialog(student)}>
                             <Edit className="h-4 w-4 mr-1" /> Edit
                         </Button>
                         <Button
@@ -233,6 +319,148 @@ export function StudentDataClient({
             </DialogClose>
             <Button variant="destructive" onClick={confirmDelete}>
               Hapus
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>{editingStudent ? 'Edit Siswa' : 'Tambah Siswa Baru'}</DialogTitle>
+          </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4 py-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nama Lengkap</FormLabel>
+                    <FormControl>
+                      <Input placeholder="cth. Budi Santoso" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="nis"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>NIS</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Masukkan NIS..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                  control={form.control}
+                  name="class"
+                  render={({ field }) => (
+                      <FormItem>
+                      <FormLabel>Kelas</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                              <SelectTrigger><SelectValue placeholder="Pilih Kelas" /></SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                              {classes.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                          </SelectContent>
+                      </Select>
+                      <FormMessage />
+                      </FormItem>
+                  )}
+              />
+               <FormField
+                  control={form.control}
+                  name="gender"
+                  render={({ field }) => (
+                      <FormItem>
+                      <FormLabel>Jenis Kelamin</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                              <SelectTrigger><SelectValue placeholder="Pilih Jenis Kelamin" /></SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                              <SelectItem value="L">Laki-laki</SelectItem>
+                              <SelectItem value="P">Perempuan</SelectItem>
+                          </SelectContent>
+                      </Select>
+                      <FormMessage />
+                      </FormItem>
+                  )}
+              />
+              <FormField
+                  control={form.control}
+                  name="status"
+                  render={({ field }) => (
+                      <FormItem>
+                      <FormLabel>Status</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                              <SelectTrigger><SelectValue placeholder="Pilih Status" /></SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                              <SelectItem value="Aktif">Aktif</SelectItem>
+                              <SelectItem value="Tidak Aktif">Tidak Aktif</SelectItem>
+                          </SelectContent>
+                      </Select>
+                      <FormMessage />
+                      </FormItem>
+                  )}
+              />
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button type="button" variant="outline">Batal</Button>
+                </DialogClose>
+                <Button type="submit">Simpan</Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Import Data Siswa</DialogTitle>
+            <DialogDescription>
+              Pilih file Excel (.xlsx) untuk mengimpor data siswa secara massal. Pastikan format file sesuai dengan template.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+              <div>
+                <label htmlFor="class-import-filter" className="text-sm font-medium">Impor ke Kelas</label>
+                <Select defaultValue={classes[0]}>
+                    <SelectTrigger id="class-import-filter" className="mt-1">
+                        <SelectValue placeholder="Pilih Kelas Tujuan" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {classes.map((c) => (
+                        <SelectItem key={c} value={c}>
+                            {c}
+                        </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+              </div>
+            <div>
+                <label htmlFor="file-upload" className="text-sm font-medium">File Excel</label>
+                <Input id="file-upload" type="file" accept=".xlsx, .xls" className="mt-1" />
+            </div>
+            <Button variant="link" className="p-0 h-auto">Download Template</Button>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Batal</Button>
+            </DialogClose>
+            <Button onClick={handleImport}>
+              <Upload className="mr-2" />
+              Import
             </Button>
           </DialogFooter>
         </DialogContent>
