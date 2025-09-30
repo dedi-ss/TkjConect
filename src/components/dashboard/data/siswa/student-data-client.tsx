@@ -180,6 +180,24 @@ export function StudentDataClient({
     setIsImportDialogOpen(false);
     toast({ title: "Import Berhasil (Simulasi)", description: "Data siswa dari file Excel telah berhasil diimpor." });
   }
+
+  const handleDownloadTemplate = () => {
+    const csvHeader = "nama,nis,kelas,jenis_kelamin (L/P),status (Aktif/Tidak Aktif)\n";
+    const csvExample = "John Doe,12345,XII RPL 1,L,Aktif\nJane Smith,12346,XII RPL 1,P,Aktif\n";
+    const csvContent = csvHeader + csvExample;
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    if (link.href) {
+      URL.revokeObjectURL(link.href);
+    }
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", "template_import_siswa.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast({ title: "Template Diunduh", description: "Template import siswa telah diunduh." });
+  };
   
   return (
     <div className="space-y-6">
@@ -452,7 +470,7 @@ export function StudentDataClient({
                 <label htmlFor="file-upload" className="text-sm font-medium">File Excel</label>
                 <Input id="file-upload" type="file" accept=".xlsx, .xls" className="mt-1" />
             </div>
-            <Button variant="link" className="p-0 h-auto">Download Template</Button>
+            <Button variant="link" className="p-0 h-auto" onClick={handleDownloadTemplate}>Download Template</Button>
           </div>
           <DialogFooter>
             <DialogClose asChild>
