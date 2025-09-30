@@ -30,3 +30,12 @@ export type Teacher = {
     status: 'Aktif' | 'Tidak Aktif';
     avatar: string;
 }
+
+export type AttendanceStatus = "Hadir" | "Sakit" | "Izin" | "Alpha";
+
+export type AttendanceRecord = {
+  student: Student;
+  status: AttendanceStatus;
+  checkInTime: string | null;
+  notes?: string;
+};
