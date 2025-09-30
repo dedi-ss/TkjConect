@@ -12,7 +12,7 @@ export default function RoleSelectionPage() {
     <main className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
       <div className="w-full max-w-4xl">
         <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-primary">EduTrack</h1>
+            <h1 className="text-4xl font-bold text-primary">TKJ Conect</h1>
             <p className="text-muted-foreground text-lg mt-2">Sistem Absensi Digital Terintegrasi</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
