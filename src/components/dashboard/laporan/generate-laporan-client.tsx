@@ -104,7 +104,7 @@ export function GenerateLaporanClient() {
                       variant="outline"
                       className={cn('w-full justify-start text-left font-normal mt-1', !startDate && 'text-muted-foreground')}
                     >
-                      <CalendarIcon className="mr-2" />
+                      <CalendarIcon className="mr-2 h-4 w-4" />
                       {startDate ? format(startDate, 'dd/MM/yyyy') : <span>dd/mm/yyyy</span>}
                     </Button>
                   </PopoverTrigger>
@@ -122,7 +122,7 @@ export function GenerateLaporanClient() {
                       variant="outline"
                       className={cn('w-full justify-start text-left font-normal mt-1', !endDate && 'text-muted-foreground')}
                     >
-                      <CalendarIcon className="mr-2" />
+                      <CalendarIcon className="mr-2 h-4 w-4" />
                       {endDate ? format(endDate, 'dd/MM/yyyy') : <span>dd/mm/yyyy</span>}
                     </Button>
                   </PopoverTrigger>
@@ -134,7 +134,7 @@ export function GenerateLaporanClient() {
             </div>
             
             <Button onClick={handleGenerateReport} className="w-full">
-              <FileText className="mr-2" />
+              <FileText className="mr-2 h-4 w-4" />
               Generate Laporan
             </Button>
           </CardContent>
@@ -148,8 +148,8 @@ export function GenerateLaporanClient() {
                     <CardDescription>Preview laporan yang telah digenerate akan muncul di sini.</CardDescription>
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="outline" size="sm"><FileSpreadsheet className="mr-2"/>Download Excel</Button>
-                    <Button size="sm"><Download className="mr-2"/>Download PDF</Button>
+                    <Button variant="outline" size="sm"><FileSpreadsheet className="mr-2 h-4 w-4"/>Download Excel</Button>
+                    <Button size="sm"><Download className="mr-2 h-4 w-4"/>Download PDF</Button>
                 </div>
             </CardHeader>
             <CardContent>
@@ -167,9 +167,9 @@ export function GenerateLaporanClient() {
             <CardTitle>Laporan Cepat</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <Button variant="outline" className="w-full justify-start"><CalendarDays className="mr-2" /> Absensi Hari Ini</Button>
-            <Button variant="outline" className="w-full justify-start"><CalendarCheck className="mr-2" /> Rekap Minggu Ini</Button>
-            <Button variant="outline" className="w-full justify-start"><CalendarClock className="mr-2" /> Rekap Bulan Ini</Button>
+            <Button variant="outline" className="w-full justify-start"><CalendarDays className="mr-2 h-4 w-4" /> Absensi Hari Ini</Button>
+            <Button variant="outline" className="w-full justify-start"><CalendarCheck className="mr-2 h-4 w-4" /> Rekap Minggu Ini</Button>
+            <Button variant="outline" className="w-full justify-start"><CalendarClock className="mr-2 h-4 w-4" /> Rekap Bulan Ini</Button>
           </CardContent>
         </Card>
         
