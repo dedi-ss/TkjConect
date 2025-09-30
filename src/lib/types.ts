@@ -32,6 +32,17 @@ export type Teacher = {
     avatar: string;
 }
 
+export type Officer = {
+    id: string;
+    nip: string;
+    name: string;
+    position: string;
+    department: string;
+    gender: 'L' | 'P';
+    status: 'Aktif' | 'Tidak Aktif';
+    avatar: string;
+}
+
 export type AttendanceStatus = "Hadir" | "Sakit" | "Izin" | "Alpha";
 
 export type AttendanceRecord = {

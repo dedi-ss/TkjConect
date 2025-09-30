@@ -1,5 +1,5 @@
 import { Users, UserCog, BookOpen, Shield, type LucideIcon } from "lucide-react";
-import type { StatCard, Attendance, Student, Teacher } from "./types";
+import type { StatCard, Attendance, Student, Teacher, Officer } from "./types";
 
 export const statCards: StatCard[] = [
   {
@@ -57,7 +57,17 @@ export const teachers: Teacher[] = [
     { id: '2', nip: '198203151997031004', name: 'Ahmad Fauzi, S.Kom., M.T', subject: 'RPL', gender: 'L', status: 'Aktif', avatar: 'user-avatar-1' },
     { id: '3', nip: '197506082006042018', name: 'Dra. Indira Sari, M.Pd', subject: 'Bahasa Indonesia', gender: 'P', status: 'Aktif', avatar: 'user-avatar-1' },
     { id: '4', nip: '198912102015032007', name: 'Sri Wahyuni, S.Pd', subject: 'Bahasa Inggris', gender: 'P', status: 'Aktif', avatar: 'user-avatar-1' },
-]
+];
+
+export const officers: Officer[] = [
+    { id: '1', nip: '198001011999032001', name: 'Dra. Sari Indrawati, M.M', position: 'Kepala Sekolah', department: 'Manajemen', gender: 'P', status: 'Aktif', avatar: 'user-avatar-1' },
+    { id: '2', nip: '198503152010012002', name: 'Rina Marlina, S.Pd., M.Pd', position: 'Wakil Kepala Sekolah', department: 'Kurikulum', gender: 'P', status: 'Aktif', avatar: 'user-avatar-1' },
+    { id: '3', nip: '198207082008011003', name: 'Budi Santoso, S.Kom', position: 'Kepala Tata Usaha', department: 'Administrasi', gender: 'L', status: 'Aktif', avatar: 'user-avatar-1' },
+    { id: '4', nip: '199004152015032004', name: 'Dewi Sartika, A.Md', position: 'Staff Administrasi', department: 'Keuangan', gender: 'P', status: 'Aktif', avatar: 'user-avatar-1' },
+    { id: '5', nip: '198812202012011005', name: 'Ahmad Rizki, S.T', position: 'Teknisi IT', department: 'IT Support', gender: 'L', status: 'Aktif', avatar: 'user-avatar-1' },
+    { id: '6', nip: '199501012020012006', name: 'Putri Amelia', position: 'Staff Perpustakaan', department: 'Perpustakaan', gender: 'P', status: 'Tidak Aktif', avatar: 'user-avatar-1' },
+];
 
 export const classes = ['XII RPL 1', 'XII RPL 2', 'XI TKJ 1', 'XI TKJ 2', 'X MM 1', 'X MM 2', 'X MM 3'];
 export const majors = ['OTKP', 'BDP', 'AKL', 'RPL', 'IPS', 'IPA'];
+export const officerDepartments = ['Manajemen', 'Kurikulum', 'Administrasi', 'Keuangan', 'IT Support', 'Perpustakaan'];
