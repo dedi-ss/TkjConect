@@ -26,6 +26,7 @@ export type Teacher = {
     id: string;
     nip: string;
     name: string;
+    subject: string;
     gender: 'L' | 'P';
     status: 'Aktif' | 'Tidak Aktif';
     avatar: string;
