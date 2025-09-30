@@ -49,6 +49,7 @@ export const students: Student[] = [
     { id: '5', nis: '12349', name: 'Fajar Nugraha', class: 'XII RPL 1', gender: 'L', status: 'Aktif', avatar: 'student-avatar-5' },
     { id: '6', nis: '12350', name: 'Gita Amelia', class: 'XI TKJ 2', gender: 'P', status: 'Aktif', avatar: 'student-avatar-1' },
     { id: '7', nis: '12351', name: 'Hadi Prasetyo', class: 'X MM 3', gender: 'L', status: 'Aktif', avatar: 'student-avatar-2' },
+    { id: '8', nis: '12352', name: 'Indah Permata', class: 'X MM 3', gender: 'P', status: 'Aktif', avatar: 'student-avatar-2' },
 ];
 
 export const teachers: Teacher[] = [
