@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, type FC } from "react";
+import { useState, useMemo, type FC, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -76,6 +76,8 @@ const StatCard: FC<{ title: string; value: string | number; }> = ({ title, value
     </Card>
 );
 
+const LOCAL_STORAGE_KEY = 'edutrack-students';
+
 export function StudentDataClient({
   initialStudents,
   classes,
@@ -83,7 +85,19 @@ export function StudentDataClient({
   initialStudents: Student[];
   classes: string[];
 }) {
-  const [students, setStudents] = useState<Student[]>(initialStudents);
+  const [students, setStudents] = useState<Student[]>(() => {
+    if (typeof window === 'undefined') {
+      return initialStudents;
+    }
+    try {
+      const storedStudents = window.localStorage.getItem(LOCAL_STORAGE_KEY);
+      return storedStudents ? JSON.parse(storedStudents) : initialStudents;
+    } catch (error) {
+      console.error("Gagal memuat data dari localStorage", error);
+      return initialStudents;
+    }
+  });
+
   const [searchQuery, setSearchQuery] = useState("");
   const [classFilter, setClassFilter] = useState("Semua Kelas");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -94,6 +108,14 @@ export function StudentDataClient({
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   
   const { toast } = useToast();
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(students));
+    } catch (error) {
+      console.error("Gagal menyimpan data ke localStorage", error);
+    }
+  }, [students]);
 
   const form = useForm<z.infer<typeof studentSchema>>({
     resolver: zodResolver(studentSchema),
