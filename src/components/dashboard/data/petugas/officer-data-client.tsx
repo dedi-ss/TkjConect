@@ -1,6 +1,9 @@
 "use client";
 
-import { useState, useMemo, type FC } from "react";
+import { useState, useMemo, type FC, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import {
   Card,
   CardContent,
@@ -36,6 +39,14 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
+import {
   FileUp,
   PlusCircle,
   Search,
@@ -44,6 +55,16 @@ import {
   Trash2,
 } from "lucide-react";
 import type { Officer } from "@/lib/types";
+import { useToast } from "@/hooks/use-toast";
+
+const officerSchema = z.object({
+    name: z.string().min(1, "Nama tidak boleh kosong"),
+    nip: z.string().min(1, "NIP tidak boleh kosong"),
+    position: z.string().min(1, "Jabatan tidak boleh kosong"),
+    department: z.string().min(1, "Bagian tidak boleh kosong"),
+    gender: z.enum(["L", "P"], { required_error: "Jenis kelamin harus dipilih" }),
+    status: z.enum(["Aktif", "Tidak Aktif"], { required_error: "Status harus dipilih" }),
+});
 
 const StatCard: FC<{ title: string; value: string | number; }> = ({ title, value }) => (
     <Card className="shadow">
@@ -64,8 +85,34 @@ export function OfficerDataClient({
   const [officers, setOfficers] = useState<Officer[]>(initialOfficers);
   const [searchQuery, setSearchQuery] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("Semua Bagian");
+  
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [officerToDelete, setOfficerToDelete] = useState<Officer | null>(null);
+
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [editingOfficer, setEditingOfficer] = useState<Officer | null>(null);
+
+  const { toast } = useToast();
+
+  const form = useForm<z.infer<typeof officerSchema>>({
+    resolver: zodResolver(officerSchema),
+  });
+
+  useEffect(() => {
+    if (editingOfficer) {
+      form.reset(editingOfficer);
+    } else {
+      form.reset({
+        name: "",
+        nip: "",
+        position: "",
+        department: undefined,
+        gender: undefined,
+        status: "Aktif",
+      });
+    }
+  }, [editingOfficer, form]);
+
 
   const filteredOfficers = useMemo(() => {
     return officers.filter((officer) => {
@@ -84,7 +131,6 @@ export function OfficerDataClient({
     const totalPetugas = officers.length;
     const petugasAktif = officers.filter(o => o.status === 'Aktif').length;
     const totalBagian = new Set(officers.map(o => o.department)).size;
-    // This is a placeholder as 'senior' is not in the data model
     const staffSenior = officers.filter(o => o.position.includes('Kepala')).length;
     return { totalPetugas, petugasAktif, totalBagian, staffSenior };
   }, [officers]);
@@ -97,11 +143,45 @@ export function OfficerDataClient({
   const confirmDelete = () => {
     if (officerToDelete) {
       setOfficers(officers.filter((o) => o.id !== officerToDelete.id));
+      toast({ title: "Sukses", description: `Petugas "${officerToDelete.name}" berhasil dihapus.` });
       setIsDeleteDialogOpen(false);
       setOfficerToDelete(null);
     }
   };
+
+  const handleRefresh = () => {
+    setOfficers(initialOfficers);
+    setSearchQuery("");
+    setDepartmentFilter("Semua Bagian");
+    toast({ title: "Data Dimuat Ulang", description: "Data petugas telah di-refresh ke kondisi awal." });
+  };
   
+  const handleExport = () => {
+    toast({ title: "Fungsi Belum Tersedia", description: "Fitur export ke Excel sedang dalam pengembangan." });
+  };
+  
+  const openFormDialog = (officer: Officer | null) => {
+    setEditingOfficer(officer);
+    setIsFormDialogOpen(true);
+  };
+  
+  const onSubmit = (values: z.infer<typeof officerSchema>) => {
+    if (editingOfficer) {
+      setOfficers(officers.map(o => o.id === editingOfficer.id ? { ...o, ...values } : o));
+      toast({ title: "Sukses", description: "Data petugas berhasil diperbarui." });
+    } else {
+      const newOfficer: Officer = {
+        id: (officers.length + 1).toString(),
+        avatar: 'user-avatar-1',
+        ...values,
+      };
+      setOfficers([newOfficer, ...officers]);
+      toast({ title: "Sukses", description: "Petugas baru berhasil ditambahkan." });
+    }
+    setIsFormDialogOpen(false);
+    setEditingOfficer(null);
+  };
+
   return (
     <div className="space-y-6">
       <Card>
@@ -138,11 +218,11 @@ export function OfficerDataClient({
               </SelectContent>
             </Select>
           </div>
-          <Button>
+          <Button onClick={() => openFormDialog(null)}>
             <PlusCircle className="mr-2" />
             Tambah Petugas
           </Button>
-          <Button variant="outline">
+          <Button variant="outline" onClick={handleExport}>
             <FileUp className="mr-2" />
             Export Excel
           </Button>
@@ -165,7 +245,7 @@ export function OfficerDataClient({
                 Total: {filteredOfficers.length} petugas
               </CardDescription>
             </div>
-            <Button variant="ghost" size="sm" className="hover:bg-primary/80">
+            <Button variant="ghost" size="sm" className="hover:bg-primary/80" onClick={handleRefresh}>
               <RefreshCw className="mr-2 h-4 w-4" />
               Refresh
             </Button>
@@ -202,7 +282,7 @@ export function OfficerDataClient({
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right space-x-2">
-                        <Button variant="outline" size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90">
+                        <Button variant="outline" size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90" onClick={() => openFormDialog(officer)}>
                             <Edit className="h-4 w-4 mr-1" /> Edit
                         </Button>
                         <Button
@@ -238,6 +318,119 @@ export function OfficerDataClient({
               Hapus
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>{editingOfficer ? 'Edit Petugas' : 'Tambah Petugas Baru'}</DialogTitle>
+          </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4 py-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nama Lengkap</FormLabel>
+                    <FormControl>
+                      <Input placeholder="cth. Budi Santoso, S.Kom" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="nip"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>NIP</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Masukkan NIP..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="position"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Jabatan</FormLabel>
+                    <FormControl>
+                      <Input placeholder="cth. Staff Administrasi" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                  control={form.control}
+                  name="department"
+                  render={({ field }) => (
+                      <FormItem>
+                      <FormLabel>Bagian</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                              <SelectTrigger><SelectValue placeholder="Pilih Bagian" /></SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                              {departments.map(dep => <SelectItem key={dep} value={dep}>{dep}</SelectItem>)}
+                          </SelectContent>
+                      </Select>
+                      <FormMessage />
+                      </FormItem>
+                  )}
+              />
+               <FormField
+                  control={form.control}
+                  name="gender"
+                  render={({ field }) => (
+                      <FormItem>
+                      <FormLabel>Jenis Kelamin</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                              <SelectTrigger><SelectValue placeholder="Pilih Jenis Kelamin" /></SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                              <SelectItem value="L">Laki-laki</SelectItem>
+                              <SelectItem value="P">Perempuan</SelectItem>
+                          </SelectContent>
+                      </Select>
+                      <FormMessage />
+                      </FormItem>
+                  )}
+              />
+              <FormField
+                  control={form.control}
+                  name="status"
+                  render={({ field }) => (
+                      <FormItem>
+                      <FormLabel>Status</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                              <SelectTrigger><SelectValue placeholder="Pilih Status" /></SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                              <SelectItem value="Aktif">Aktif</SelectItem>
+                              <SelectItem value="Tidak Aktif">Tidak Aktif</SelectItem>
+                          </SelectContent>
+                      </Select>
+                      <FormMessage />
+                      </FormItem>
+                  )}
+              />
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button type="button" variant="outline">Batal</Button>
+                </DialogClose>
+                <Button type="submit">Simpan</Button>
+              </DialogFooter>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
     </div>

@@ -16,9 +16,12 @@ import { Button } from "@/components/ui/button";
 import { Sidebar } from "./sidebar";
 import placeholderImages from "@/lib/placeholder-images.json";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
   const userAvatar = placeholderImages.placeholderImages.find(p => p.id === 'user-avatar-1');
+  const router = useRouter();
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-card px-4 sm:px-6">
@@ -56,10 +59,16 @@ export default function Header() {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Admin</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Profil</DropdownMenuItem>
-          <DropdownMenuItem>Pengaturan</DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="#">Profil</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="#">Pengaturan</Link>
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Logout</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => router.push('/mobile/login')}>
+            Logout
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </header>
