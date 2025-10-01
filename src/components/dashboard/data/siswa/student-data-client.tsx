@@ -83,15 +83,18 @@ const LOCAL_STORAGE_KEY = 'edutrack-students';
 export function StudentDataClient({
   initialStudents,
   classes,
+  majors,
 }: {
   initialStudents: Student[];
   classes: string[];
+  majors: string[];
 }) {
   const [students, setStudents] = useState<Student[]>(initialStudents);
   const [isClient, setIsClient] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [classFilter, setClassFilter] = useState("Semua Kelas");
+  const [majorFilter, setMajorFilter] = useState("Semua Jurusan");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
 
@@ -107,11 +110,14 @@ export function StudentDataClient({
       const storedStudents = window.localStorage.getItem(LOCAL_STORAGE_KEY);
       if (storedStudents) {
         setStudents(JSON.parse(storedStudents));
+      } else {
+        setStudents(initialStudents);
       }
     } catch (error) {
       console.error("Gagal memuat data dari localStorage", error);
+      setStudents(initialStudents);
     }
-  }, []);
+  }, [initialStudents]);
 
 
   useEffect(() => {
@@ -142,9 +148,12 @@ export function StudentDataClient({
         student.nis.toLowerCase().includes(searchQuery.toLowerCase());
       const classMatch =
         classFilter === "Semua Kelas" || student.class === classFilter;
-      return searchMatch && classMatch;
+      
+      const majorMatch = majorFilter === "Semua Jurusan" || student.class.toLowerCase().includes(majorFilter.toLowerCase().split(' ')[0]);
+
+      return searchMatch && classMatch && majorMatch;
     });
-  }, [students, searchQuery, classFilter]);
+  }, [students, searchQuery, classFilter, majorFilter]);
   
   const stats = useMemo(() => {
     const totalSiswa = students.length;
@@ -201,12 +210,19 @@ export function StudentDataClient({
     setEditingStudent(null);
   };
 
+  const handleRefresh = () => {
+    setStudents(initialStudents);
+    if (isClient) {
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+    }
+    toast({ title: "Refresh", description: "Data siswa telah dikembalikan ke data awal." });
+  };
+  
   const handleExport = () => {
     toast({ title: "Fungsi Belum Tersedia", description: "Fitur export ke Excel sedang dalam pengembangan." });
   };
   
   const handleImport = () => {
-    // Simulasi penambahan data siswa dari import
     const importedStudents: Student[] = [
         { id: `import-${Date.now()}`, nis: '99991', name: 'Siswa Impor Satu', class: 'XII RPL 1', gender: 'L', status: 'Aktif', avatar: 'student-avatar-1' },
         { id: `import-${Date.now()+1}`, nis: '99992', name: 'Siswa Impor Dua', class: 'XII RPL 1', gender: 'P', status: 'Aktif', avatar: 'student-avatar-2' },
@@ -233,7 +249,15 @@ export function StudentDataClient({
   };
 
   if (!isClient) {
-    return null; // Atau tampilkan UI loading skeleton
+    return (
+        <div className="space-y-6">
+            <Card>
+                <CardContent className="p-4">
+                    <div className="h-10 bg-muted rounded-md w-1/2 mx-auto animate-pulse"></div>
+                </CardContent>
+            </Card>
+        </div>
+    );
   }
   
   return (
@@ -254,6 +278,22 @@ export function StudentDataClient({
             </div>
           </div>
           <div>
+            <Label htmlFor="major-filter">Filter Jurusan</Label>
+            <Select value={majorFilter} onValueChange={setMajorFilter}>
+              <SelectTrigger id="major-filter" className="mt-1">
+                <SelectValue placeholder="Semua Jurusan" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Semua Jurusan">Semua Jurusan</SelectItem>
+                {majors.map((m) => (
+                  <SelectItem key={m} value={m}>
+                    {m}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
             <Label htmlFor="class-filter">Filter Kelas</Label>
             <Select
               value={classFilter}
@@ -272,19 +312,21 @@ export function StudentDataClient({
               </SelectContent>
             </Select>
           </div>
-          <div className="grid grid-cols-2 gap-2 md:col-span-2">
+          <div className="grid grid-cols-1 gap-2">
             <Button onClick={() => openFormDialog(null)} className="w-full">
               <PlusCircle className="mr-2" />
               Tambah
             </Button>
-            <Button variant="outline" onClick={() => setIsImportDialogOpen(true)}>
-                <Upload className="mr-2" />
-                Import
-            </Button>
-            <Button variant="outline" onClick={handleExport} className="col-span-2">
-              <FileUp className="mr-2" />
-              Export Excel
-            </Button>
+            <div className="grid grid-cols-2 gap-2">
+              <Button variant="outline" onClick={() => setIsImportDialogOpen(true)}>
+                  <Upload className="mr-2" />
+                  Import
+              </Button>
+              <Button variant="outline" onClick={handleExport}>
+                <FileUp className="mr-2" />
+                Export
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -305,7 +347,7 @@ export function StudentDataClient({
                 Total: {filteredStudents.length} siswa
               </CardDescription>
             </div>
-            <Button variant="ghost" size="sm" className="hover:bg-primary/80">
+            <Button variant="ghost" size="sm" className="hover:bg-primary/80" onClick={handleRefresh}>
               <RefreshCw className="mr-2 h-4 w-4" />
               Refresh
             </Button>
