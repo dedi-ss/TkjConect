@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo, type FC, useEffect } from "react";
@@ -86,18 +87,8 @@ export function StudentDataClient({
   initialStudents: Student[];
   classes: string[];
 }) {
-  const [students, setStudents] = useState<Student[]>(() => {
-    if (typeof window === 'undefined') {
-      return initialStudents;
-    }
-    try {
-      const storedStudents = window.localStorage.getItem(LOCAL_STORAGE_KEY);
-      return storedStudents ? JSON.parse(storedStudents) : initialStudents;
-    } catch (error) {
-      console.error("Gagal memuat data dari localStorage", error);
-      return initialStudents;
-    }
-  });
+  const [students, setStudents] = useState<Student[]>(initialStudents);
+  const [isClient, setIsClient] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [classFilter, setClassFilter] = useState("Semua Kelas");
@@ -111,12 +102,28 @@ export function StudentDataClient({
   const { toast } = useToast();
 
   useEffect(() => {
+    setIsClient(true);
     try {
-      window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(students));
+      const storedStudents = window.localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (storedStudents) {
+        setStudents(JSON.parse(storedStudents));
+      }
     } catch (error) {
-      console.error("Gagal menyimpan data ke localStorage", error);
+      console.error("Gagal memuat data dari localStorage", error);
+      // Data sudah diinisialisasi dengan initialStudents, jadi tidak perlu set lagi
     }
-  }, [students]);
+  }, []);
+
+
+  useEffect(() => {
+    if (isClient) {
+        try {
+            window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(students));
+        } catch (error) {
+            console.error("Gagal menyimpan data ke localStorage", error);
+        }
+    }
+  }, [students, isClient]);
 
   const form = useForm<z.infer<typeof studentSchema>>({
     resolver: zodResolver(studentSchema),
@@ -513,5 +520,3 @@ export function StudentDataClient({
     </div>
   );
 }
-
-    
