@@ -152,12 +152,12 @@ export function StudentDataClient({
       
       const studentMajorAbbr = student.class.split(' ')[1];
       const majorMatch = majorFilter === "Semua Jurusan" || (
-        (majorFilter === 'Teknik Komputer dan Jaringan' && studentMajorAbbr === 'TKJ') ||
-        (majorFilter === 'Rekayasa Perangkat Lunak' && studentMajorAbbr === 'RPL') ||
-        (majorFilter === 'Multimedia' && studentMajorAbbr === 'MM') ||
-        (majorFilter === 'Otomatisasi dan Tata Kelola Perkantoran' && studentMajorAbbr === 'OTKP') ||
-        (majorFilter === 'Bisnis Daring dan Pemasaran' && studentMajorAbbr === 'BDP') ||
-        (majorFilter === 'Akuntansi dan Keuangan Lembaga' && studentMajorAbbr === 'AKL')
+        (majorFilter === 'Teknik Komputer dan Jaringan' && studentMajorAbbr.startsWith('TKJ')) ||
+        (majorFilter === 'Rekayasa Perangkat Lunak' && studentMajorAbbr.startsWith('RPL')) ||
+        (majorFilter === 'Multimedia' && studentMajorAbbr.startsWith('MM')) ||
+        (majorFilter === 'Otomatisasi dan Tata Kelola Perkantoran' && studentMajorAbbr.startsWith('OTKP')) ||
+        (majorFilter === 'Bisnis Daring dan Pemasaran' && studentMajorAbbr.startsWith('BDP')) ||
+        (majorFilter === 'Akuntansi dan Keuangan Lembaga' && studentMajorAbbr.startsWith('AKL'))
       );
 
       return searchMatch && classMatch && majorMatch;
@@ -242,8 +242,8 @@ export function StudentDataClient({
   }
 
   const handleDownloadTemplate = () => {
-    const csvHeader = "nama,nis,kelas,jenis_kelamin (L/P),status (Aktif/Tidak Aktif)\n";
-    const csvExample = "John Doe,12345,XII RPL 1,L,Aktif\nJane Smith,12346,XII RPL 1,P,Aktif\n";
+    const csvHeader = "nama,nis,kelas,jenis_kelamin (L/P),status (Aktif/Tidak Aktif)\\n";
+    const csvExample = "John Doe,12345,XII RPL 1,L,Aktif\\nJane Smith,12346,XII RPL 1,P,Aktif\\n";
     const csvContent = csvHeader + csvExample;
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
@@ -259,24 +259,38 @@ export function StudentDataClient({
 
   if (!isClient) {
     return (
-        <div className="space-y-6">
-            <Card>
-                <CardHeader>
-                    <div className="h-8 bg-muted rounded-md w-1/4 animate-pulse"></div>
-                    <div className="h-4 bg-muted rounded-md w-1/2 animate-pulse"></div>
-                </CardHeader>
-                <CardContent className="p-4">
-                    <div className="h-10 bg-muted rounded-md w-full animate-pulse"></div>
-                </CardContent>
-            </Card>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="h-24 bg-muted rounded-md animate-pulse"></div>
-                <div className="h-24 bg-muted rounded-md animate-pulse"></div>
-                <div className="h-24 bg-muted rounded-md animate-pulse"></div>
-                <div className="h-24 bg-muted rounded-md animate-pulse"></div>
-            </div>
-            <div className="h-96 bg-muted rounded-md animate-pulse"></div>
+      <div className="space-y-6">
+        <Card>
+            <CardContent className="p-4 grid grid-cols-1 md:grid-cols-5 gap-4 items-end animate-pulse">
+              <div className="md:col-span-2 space-y-2">
+                  <div className="h-4 bg-muted rounded w-1/4"></div>
+                  <div className="h-10 bg-muted rounded"></div>
+              </div>
+              <div className="space-y-2">
+                  <div className="h-4 bg-muted rounded w-1/4"></div>
+                  <div className="h-10 bg-muted rounded"></div>
+              </div>
+               <div className="space-y-2">
+                  <div className="h-4 bg-muted rounded w-1/4"></div>
+                  <div className="h-10 bg-muted rounded"></div>
+              </div>
+              <div className="grid grid-cols-1 gap-2">
+                <div className="h-10 bg-muted rounded"></div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="h-10 bg-muted rounded"></div>
+                  <div className="h-10 bg-muted rounded"></div>
+                </div>
+              </div>
+            </CardContent>
+        </Card>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="h-24 bg-muted rounded-md animate-pulse"></div>
+            <div className="h-24 bg-muted rounded-md animate-pulse"></div>
+            <div className="h-24 bg-muted rounded-md animate-pulse"></div>
+            <div className="h-24 bg-muted rounded-md animate-pulse"></div>
         </div>
+        <div className="h-96 bg-muted rounded-md animate-pulse"></div>
+    </div>
     );
   }
   
