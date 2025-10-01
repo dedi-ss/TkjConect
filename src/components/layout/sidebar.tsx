@@ -18,6 +18,7 @@ import {
   UserCheck,
   UserCog,
   Users,
+  BookMarked
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -64,6 +65,11 @@ const menuItems = [
           href: "/dashboard/data/kelas",
           label: "Data Kelas & Jurusan",
           icon: BookCopy,
+        },
+        {
+          href: "/dashboard/data/mata-pelajaran",
+          label: "Data Mata Pelajaran",
+          icon: BookMarked,
         },
         {
           href: "/dashboard/data/petugas",

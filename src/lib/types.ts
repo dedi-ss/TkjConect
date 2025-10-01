@@ -43,6 +43,12 @@ export type Officer = {
     avatar: string;
 }
 
+export type Subject = {
+  id: string;
+  name: string;
+  code: string;
+}
+
 export type AttendanceStatus = "Hadir" | "Sakit" | "Izin" | "Alpha";
 
 export type AttendanceRecord = {

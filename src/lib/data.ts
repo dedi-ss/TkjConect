@@ -68,6 +68,17 @@ export const officers: Officer[] = [
     { id: '6', nip: '199501012020012006', name: 'Putri Amelia', position: 'Staff Perpustakaan', department: 'Perpustakaan', gender: 'P', status: 'Tidak Aktif', avatar: 'user-avatar-1' },
 ];
 
+export const initialSubjects = [
+    'Perencanaan dan Pengalamatan Jaringan',
+    'Teknologi Jaringan Kabel dan Nirkabel',
+    'Keamanan Jaringan',
+    'Pemasangan dan Konfigurasi Perangkat Jaringan',
+    'Administrasi Sistem Jaringan',
+    'Dasar-dasar teknik jaringan komputer',
+    'Koding dan Kecerdasan Artifisial (KA)',
+    'Produk Kreatif dan Kewirausahaan (PKK)'
+];
+
 export const classes = ['XII RPL 1', 'XII RPL 2', 'XI TKJ 1', 'XI TKJ 2', 'X MM 1', 'X MM 2', 'X MM 3'];
 export const majors = ['Teknik Komputer dan Jaringan', 'Rekayasa Perangkat Lunak', 'Multimedia', 'Otomatisasi dan Tata Kelola Perkantoran', 'Bisnis Daring dan Pemasaran', 'Akuntansi dan Keuangan Lembaga'];
 export const officerDepartments = ['Manajemen', 'Kurikulum', 'Administrasi', 'Keuangan', 'IT Support', 'Perpustakaan'];
