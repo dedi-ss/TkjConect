@@ -38,13 +38,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import type { Subject } from '@/lib/types';
+import { Badge } from '@/components/ui/badge';
 
 const SUBJECT_STORAGE_KEY = 'edutrack-subjects';
 
 // Format initial string array to Subject object array
 const formatInitialSubjects = (subjects: string[]): Subject[] =>
   subjects.map((subject, index) => {
-    const code = subject.split(' ').map(w => w[0]).join('').toUpperCase() + (index + 1);
+    const code = subject.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 4) + (index + 1);
     return { id: (index + 1).toString(), name: subject, code };
   });
 
@@ -73,7 +74,7 @@ export function SubjectDataClient({
         console.error("Failed to parse subjects from localStorage", error);
         setSubjects(formattedInitialSubjects);
     }
-  }, []);
+  }, [formattedInitialSubjects]);
   
   useEffect(() => {
     if (isClient) {
@@ -94,11 +95,12 @@ export function SubjectDataClient({
   
   // Filtered Memo
   const filteredSubjects = useMemo(() => {
+    if (!isClient) return [];
     return subjects.filter(subject => 
         subject.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         subject.code.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [subjects, searchQuery]);
+  }, [subjects, searchQuery, isClient]);
 
   // Handlers for Opening Dialogs
   const handleOpenForm = (subject: Subject | null) => {
