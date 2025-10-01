@@ -103,16 +103,20 @@ export function StudentDataClient({
 
   useEffect(() => {
     setIsClient(true);
-    try {
-      const storedStudents = window.localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (storedStudents) {
-        setStudents(JSON.parse(storedStudents));
-      }
-    } catch (error) {
-      console.error("Gagal memuat data dari localStorage", error);
-      // Data sudah diinisialisasi dengan initialStudents, jadi tidak perlu set lagi
-    }
   }, []);
+
+  useEffect(() => {
+    if (isClient) {
+      try {
+        const storedStudents = window.localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (storedStudents) {
+          setStudents(JSON.parse(storedStudents));
+        }
+      } catch (error) {
+        console.error("Gagal memuat data dari localStorage", error);
+      }
+    }
+  }, [isClient]);
 
 
   useEffect(() => {
@@ -520,3 +524,5 @@ export function StudentDataClient({
     </div>
   );
 }
+
+    
