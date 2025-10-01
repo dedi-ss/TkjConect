@@ -199,8 +199,29 @@ export function TeacherDataClient({
   };
   
   const handleImport = () => {
+    const importedTeachers: Teacher[] = [
+      { id: `import-guru-${Date.now()}`, nip: '199001012024011001', name: 'Guru Impor Satu', subject: 'PKK', gender: 'L', status: 'Aktif', avatar: 'user-avatar-1' },
+      { id: `import-guru-${Date.now()+1}`, nip: '199202022024022002', name: 'Guru Impor Dua', subject: 'Koding dan Kecerdasan Artifisial (KA)', gender: 'P', status: 'Aktif', avatar: 'user-avatar-1' },
+    ];
+    setTeachers(prev => [...importedTeachers, ...prev]);
     setIsImportDialogOpen(false);
-    toast({ title: "Import Berhasil (Simulasi)", description: "Data guru dari file Excel telah berhasil diimpor." });
+    toast({ title: "Import Berhasil (Simulasi)", description: "Data guru dari file Excel telah berhasil diimpor dan disimpan." });
+  }
+
+  const handleDownloadTemplate = () => {
+    const csvHeader = "nama,nip,mata_pelajaran,jenis_kelamin (L/P),status (Aktif/Tidak Aktif)\n";
+    const csvExample = "Bambang Pamungkas,198501012010011001,PKK,L,Aktif\nSusi Susanti,198602022011022002,Koding dan Kecerdasan Artifisial (KA),P,Aktif\n";
+    const csvContent = csvHeader + csvExample;
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", "template_import_guru.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast({ title: "Template Diunduh", description: "Template import guru telah diunduh." });
   }
 
   return (
@@ -459,7 +480,7 @@ export function TeacherDataClient({
                 <Label htmlFor="file-upload">File Excel</Label>
                 <Input id="file-upload" type="file" accept=".xlsx, .xls, .csv" className="mt-1" />
             </div>
-            <Button variant="link" className="p-0 h-auto">Download Template</Button>
+            <Button variant="link" className="p-0 h-auto" onClick={handleDownloadTemplate}>Download Template</Button>
           </div>
           <DialogFooter>
             <DialogClose asChild><Button variant="outline">Batal</Button></DialogClose>
