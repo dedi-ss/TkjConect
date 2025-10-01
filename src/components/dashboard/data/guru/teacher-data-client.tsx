@@ -57,6 +57,7 @@ import {
 } from "lucide-react";
 import type { Teacher } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
+import { Label } from "@/components/ui/label";
 
 const teacherSchema = z.object({
     name: z.string().min(1, "Nama tidak boleh kosong"),
@@ -207,7 +208,7 @@ export function TeacherDataClient({
       <Card>
         <CardContent className="p-4 grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
           <div className="md:col-span-2">
-            <label htmlFor="search-teacher" className="text-sm font-medium">Cari Guru</label>
+            <Label htmlFor="search-teacher" className="text-sm font-medium">Cari Guru</Label>
             <div className="relative mt-1">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -220,7 +221,7 @@ export function TeacherDataClient({
             </div>
           </div>
           <div>
-            <label htmlFor="subject-filter" className="text-sm font-medium">Filter Mata Pelajaran</label>
+            <Label htmlFor="subject-filter" className="text-sm font-medium">Filter Mata Pelajaran</Label>
             <Select
               value={subjectFilter}
               onValueChange={setSubjectFilter}
