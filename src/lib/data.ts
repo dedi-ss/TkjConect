@@ -69,5 +69,5 @@ export const officers: Officer[] = [
 ];
 
 export const classes = ['XII RPL 1', 'XII RPL 2', 'XI TKJ 1', 'XI TKJ 2', 'X MM 1', 'X MM 2', 'X MM 3'];
-export const majors = ['OTKP', 'BDP', 'AKL', 'RPL', 'IPS', 'IPA'];
+export const majors = ['Teknik Komputer dan Jaringan', 'Rekayasa Perangkat Lunak', 'Multimedia', 'Otomatisasi dan Tata Kelola Perkantoran', 'Bisnis Daring dan Pemasaran', 'Akuntansi dan Keuangan Lembaga'];
 export const officerDepartments = ['Manajemen', 'Kurikulum', 'Administrasi', 'Keuangan', 'IT Support', 'Perpustakaan'];
