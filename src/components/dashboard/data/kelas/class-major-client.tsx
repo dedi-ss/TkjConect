@@ -195,6 +195,22 @@ export function ClassMajorClient({
     setIsImportDialogOpen(false);
     toast({ title: 'Import Berhasil (Simulasi)', description: 'Data kelas & jurusan telah diimpor.' });
   };
+  
+  const handleDownloadTemplate = () => {
+    const csvHeader = "tipe (jurusan/kelas),nama,jurusan_kelas (opsional)\n";
+    const csvExample = `jurusan,Teknik Pemesinan,\nkelas,X,Teknik Pemesinan\nkelas,XI,Teknik Pemesinan\n`;
+    const csvContent = csvHeader + csvExample;
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", "template_import_kelas_jurusan.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast({ title: "Template Diunduh", description: "Template import telah diunduh." });
+  };
 
 
   return (
@@ -390,9 +406,9 @@ export function ClassMajorClient({
             <div className="py-4 space-y-4">
                 <div>
                     <Label htmlFor="file-upload">File Excel</Label>
-                    <Input id="file-upload" type="file" accept=".xlsx, .xls" className="mt-1" />
+                    <Input id="file-upload" type="file" accept=".xlsx, .xls, .csv" className="mt-1" />
                 </div>
-                <Button variant="link" className="p-0 h-auto">Download Template</Button>
+                <Button variant="link" className="p-0 h-auto" onClick={handleDownloadTemplate}>Download Template</Button>
             </div>
             <DialogFooter>
                 <DialogClose asChild><Button variant="outline">Batal</Button></DialogClose>
@@ -403,5 +419,3 @@ export function ClassMajorClient({
     </div>
   );
 }
-
-    
