@@ -57,6 +57,7 @@ import {
 } from "lucide-react";
 import type { Student } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
+import { Label } from "@/components/ui/label";
 
 const studentSchema = z.object({
     name: z.string().min(1, "Nama tidak boleh kosong"),
@@ -199,8 +200,14 @@ export function StudentDataClient({
   };
   
   const handleImport = () => {
+    // Simulasi penambahan data siswa dari import
+    const importedStudents: Student[] = [
+        { id: `import-${Date.now()}`, nis: '99991', name: 'Siswa Impor Satu', class: 'XII RPL 1', gender: 'L', status: 'Aktif', avatar: 'student-avatar-1' },
+        { id: `import-${Date.now()+1}`, nis: '99992', name: 'Siswa Impor Dua', class: 'XII RPL 1', gender: 'P', status: 'Aktif', avatar: 'student-avatar-2' },
+    ];
+    setStudents(prev => [...importedStudents, ...prev]);
     setIsImportDialogOpen(false);
-    toast({ title: "Import Berhasil (Simulasi)", description: "Data siswa dari file Excel telah berhasil diimpor." });
+    toast({ title: "Import Berhasil (Simulasi)", description: "Data siswa baru telah ditambahkan dan disimpan." });
   }
 
   const handleDownloadTemplate = () => {
@@ -209,15 +216,13 @@ export function StudentDataClient({
     const csvContent = csvHeader + csvExample;
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
-    if (link.href) {
-      URL.revokeObjectURL(link.href);
-    }
     const url = URL.createObjectURL(blob);
     link.setAttribute("href", url);
     link.setAttribute("download", "template_import_siswa.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
     toast({ title: "Template Diunduh", description: "Template import siswa telah diunduh." });
   };
   
@@ -226,7 +231,7 @@ export function StudentDataClient({
       <Card>
         <CardContent className="p-4 grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
           <div className="md:col-span-2">
-            <label htmlFor="search-student" className="text-sm font-medium">Cari Siswa</label>
+            <Label htmlFor="search-student">Cari Siswa</Label>
             <div className="relative mt-1">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -239,7 +244,7 @@ export function StudentDataClient({
             </div>
           </div>
           <div>
-            <label htmlFor="class-filter" className="text-sm font-medium">Filter Kelas</label>
+            <Label htmlFor="class-filter">Filter Kelas</Label>
             <Select
               value={classFilter}
               onValueChange={setClassFilter}
@@ -474,7 +479,7 @@ export function StudentDataClient({
           </DialogHeader>
           <div className="py-4 space-y-4">
               <div>
-                <label htmlFor="class-import-filter" className="text-sm font-medium">Impor ke Kelas</label>
+                <Label htmlFor="class-import-filter">Impor ke Kelas</Label>
                 <Select defaultValue={classes[0]}>
                     <SelectTrigger id="class-import-filter" className="mt-1">
                         <SelectValue placeholder="Pilih Kelas Tujuan" />
@@ -489,8 +494,8 @@ export function StudentDataClient({
                 </Select>
               </div>
             <div>
-                <label htmlFor="file-upload" className="text-sm font-medium">File Excel</label>
-                <Input id="file-upload" type="file" accept=".xlsx, .xls" className="mt-1" />
+                <Label htmlFor="file-upload">File Excel</Label>
+                <Input id="file-upload" type="file" accept=".xlsx, .xls, .csv" className="mt-1" />
             </div>
             <Button variant="link" className="p-0 h-auto" onClick={handleDownloadTemplate}>Download Template</Button>
           </div>
