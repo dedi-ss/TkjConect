@@ -89,7 +89,7 @@ export function StudentDataClient({
   classes: string[];
   majors: string[];
 }) {
-  const [students, setStudents] = useState<Student[]>(initialStudents);
+  const [students, setStudents] = useState<Student[]>([]);
   const [isClient, setIsClient] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -147,15 +147,22 @@ export function StudentDataClient({
       const searchMatch =
         student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         student.nis.toLowerCase().includes(searchQuery.toLowerCase());
-      const classMatch =
-        classFilter === "Semua Kelas" || student.class === classFilter;
       
-      const majorForStudent = majors.find(major => student.class.includes(major.split(" ")[0])) || "";
-      const majorMatch = majorFilter === "Semua Jurusan" || majorForStudent.includes(majorFilter);
+      const classMatch = classFilter === "Semua Kelas" || student.class === classFilter;
+      
+      const studentMajorAbbr = student.class.split(' ')[1];
+      const majorMatch = majorFilter === "Semua Jurusan" || (
+        (majorFilter === 'Teknik Komputer dan Jaringan' && studentMajorAbbr === 'TKJ') ||
+        (majorFilter === 'Rekayasa Perangkat Lunak' && studentMajorAbbr === 'RPL') ||
+        (majorFilter === 'Multimedia' && studentMajorAbbr === 'MM') ||
+        (majorFilter === 'Otomatisasi dan Tata Kelola Perkantoran' && studentMajorAbbr === 'OTKP') ||
+        (majorFilter === 'Bisnis Daring dan Pemasaran' && studentMajorAbbr === 'BDP') ||
+        (majorFilter === 'Akuntansi dan Keuangan Lembaga' && studentMajorAbbr === 'AKL')
+      );
 
       return searchMatch && classMatch && majorMatch;
     });
-  }, [students, searchQuery, classFilter, majorFilter, majors, isClient]);
+  }, [students, searchQuery, classFilter, majorFilter, isClient]);
   
   const stats = useMemo(() => {
     const totalSiswa = students.length;
