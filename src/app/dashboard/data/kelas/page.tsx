@@ -1,6 +1,6 @@
 import { PageHeader } from "@/components/page-header";
 import { ClassMajorClient } from "@/components/dashboard/data/kelas/class-major-client";
-import { classes, majors } from "@/lib/data";
+import { classes as initialClassesData, majors } from "@/lib/data";
 
 const classData = [
     { id: '1', name: 'X', major: 'TKJ 1' },
@@ -21,3 +21,5 @@ export default function DataKelasPage() {
         </>
     );
 }
+
+    

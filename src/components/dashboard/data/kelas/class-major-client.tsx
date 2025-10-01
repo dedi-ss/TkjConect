@@ -64,26 +64,35 @@ export function ClassMajorClient({
   initialMajors: string[];
 }) {
   const { toast } = useToast();
+  const formattedInitialMajors = formatInitialMajors(initialMajorsList);
 
-  const [classes, setClasses] = useState<Class[]>(() => {
-    if (typeof window === 'undefined') return initialClasses;
-    const stored = localStorage.getItem(CLASS_STORAGE_KEY);
-    return stored ? JSON.parse(stored) : initialClasses;
-  });
+  const [classes, setClasses] = useState<Class[]>(initialClasses);
+  const [majors, setMajors] = useState<Major[]>(formattedInitialMajors);
+  const [isClient, setIsClient] = useState(false);
 
-  const [majors, setMajors] = useState<Major[]>(() => {
-    if (typeof window === 'undefined') return formatInitialMajors(initialMajorsList);
-    const stored = localStorage.getItem(MAJOR_STORAGE_KEY);
-    return stored ? JSON.parse(stored) : formatInitialMajors(initialMajorsList);
-  });
+  useEffect(() => {
+    setIsClient(true);
+    const storedClasses = localStorage.getItem(CLASS_STORAGE_KEY);
+    if (storedClasses) {
+      setClasses(JSON.parse(storedClasses));
+    }
+    const storedMajors = localStorage.getItem(MAJOR_STORAGE_KEY);
+    if (storedMajors) {
+      setMajors(JSON.parse(storedMajors));
+    }
+  }, []);
   
   useEffect(() => {
-    localStorage.setItem(CLASS_STORAGE_KEY, JSON.stringify(classes));
-  }, [classes]);
+    if (isClient) {
+      localStorage.setItem(CLASS_STORAGE_KEY, JSON.stringify(classes));
+    }
+  }, [classes, isClient]);
 
   useEffect(() => {
-    localStorage.setItem(MAJOR_STORAGE_KEY, JSON.stringify(majors));
-  }, [majors]);
+    if (isClient) {
+      localStorage.setItem(MAJOR_STORAGE_KEY, JSON.stringify(majors));
+    }
+  }, [majors, isClient]);
 
   // Dialog States
   const [isClassFormOpen, setIsClassFormOpen] = useState(false);
@@ -173,9 +182,11 @@ export function ClassMajorClient({
   const handleRefresh = (type: 'class' | 'major') => {
     if (type === 'class') {
       setClasses(initialClasses);
+      localStorage.removeItem(CLASS_STORAGE_KEY);
       toast({ title: 'Refresh', description: 'Data kelas telah dikembalikan ke data awal.' });
     } else {
-      setMajors(formatInitialMajors(initialMajorsList));
+      setMajors(formattedInitialMajors);
+      localStorage.removeItem(MAJOR_STORAGE_KEY);
       toast({ title: 'Refresh', description: 'Data jurusan telah dikembalikan ke data awal.' });
     }
   };
@@ -392,3 +403,5 @@ export function ClassMajorClient({
     </div>
   );
 }
+
+    
