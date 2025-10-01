@@ -142,6 +142,7 @@ export function StudentDataClient({
   });
 
   const filteredStudents = useMemo(() => {
+    if (!isClient) return [];
     return students.filter((student) => {
       const searchMatch =
         student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -149,11 +150,12 @@ export function StudentDataClient({
       const classMatch =
         classFilter === "Semua Kelas" || student.class === classFilter;
       
-      const majorMatch = majorFilter === "Semua Jurusan" || student.class.toLowerCase().includes(majorFilter.toLowerCase().split(' ')[0]);
+      const majorForStudent = majors.find(major => student.class.includes(major.split(" ")[0])) || "";
+      const majorMatch = majorFilter === "Semua Jurusan" || majorForStudent.includes(majorFilter);
 
       return searchMatch && classMatch && majorMatch;
     });
-  }, [students, searchQuery, classFilter, majorFilter]);
+  }, [students, searchQuery, classFilter, majorFilter, majors, isClient]);
   
   const stats = useMemo(() => {
     const totalSiswa = students.length;
@@ -252,10 +254,21 @@ export function StudentDataClient({
     return (
         <div className="space-y-6">
             <Card>
+                <CardHeader>
+                    <div className="h-8 bg-muted rounded-md w-1/4 animate-pulse"></div>
+                    <div className="h-4 bg-muted rounded-md w-1/2 animate-pulse"></div>
+                </CardHeader>
                 <CardContent className="p-4">
-                    <div className="h-10 bg-muted rounded-md w-1/2 mx-auto animate-pulse"></div>
+                    <div className="h-10 bg-muted rounded-md w-full animate-pulse"></div>
                 </CardContent>
             </Card>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="h-24 bg-muted rounded-md animate-pulse"></div>
+                <div className="h-24 bg-muted rounded-md animate-pulse"></div>
+                <div className="h-24 bg-muted rounded-md animate-pulse"></div>
+                <div className="h-24 bg-muted rounded-md animate-pulse"></div>
+            </div>
+            <div className="h-96 bg-muted rounded-md animate-pulse"></div>
         </div>
     );
   }
