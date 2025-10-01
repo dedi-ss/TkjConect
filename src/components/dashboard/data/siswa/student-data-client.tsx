@@ -150,8 +150,12 @@ export function StudentDataClient({
       
       const classMatch = classFilter === "Semua Kelas" || student.class === classFilter;
       
-      const studentMajorAbbr = student.class.split(' ')[1];
+      // Improved logic to handle various major abbreviations within class names
+      const studentMajorAbbr = student.class.split(' ')[1] || '';
       const majorMatch = majorFilter === "Semua Jurusan" || (
+          majors.find(major => major.toLowerCase().includes(majorFilter.toLowerCase())) &&
+          student.class.toLowerCase().includes(majorFilter.split(' ')[0].toLowerCase())
+      ) || (
         (majorFilter === 'Teknik Komputer dan Jaringan' && studentMajorAbbr.startsWith('TKJ')) ||
         (majorFilter === 'Rekayasa Perangkat Lunak' && studentMajorAbbr.startsWith('RPL')) ||
         (majorFilter === 'Multimedia' && studentMajorAbbr.startsWith('MM')) ||
@@ -162,7 +166,7 @@ export function StudentDataClient({
 
       return searchMatch && classMatch && majorMatch;
     });
-  }, [students, searchQuery, classFilter, majorFilter, isClient]);
+  }, [students, searchQuery, classFilter, majorFilter, isClient, majors]);
   
   const stats = useMemo(() => {
     const totalSiswa = students.length;
@@ -242,8 +246,8 @@ export function StudentDataClient({
   }
 
   const handleDownloadTemplate = () => {
-    const csvHeader = "nama,nis,kelas,jenis_kelamin (L/P),status (Aktif/Tidak Aktif)\\n";
-    const csvExample = "John Doe,12345,XII RPL 1,L,Aktif\\nJane Smith,12346,XII RPL 1,P,Aktif\\n";
+    const csvHeader = "nama,nis,kelas,jenis_kelamin (L/P),status (Aktif/Tidak Aktif)\n";
+    const csvExample = "John Doe,12345,XII RPL 1,L,Aktif\nJane Smith,12346,XII RPL 1,P,Aktif\n";
     const csvContent = csvHeader + csvExample;
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
@@ -511,8 +515,7 @@ export function StudentDataClient({
                   name="gender"
                   render={({ field }) => (
                       <FormItem>
-                      <FormLabel>Jenis Kelamin</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormLabel>Jenis Kelamin</FormLabel>                      <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                               <SelectTrigger><SelectValue placeholder="Pilih Jenis Kelamin" /></SelectTrigger>
                           </FormControl>
