@@ -103,20 +103,15 @@ export function StudentDataClient({
 
   useEffect(() => {
     setIsClient(true);
-  }, []);
-
-  useEffect(() => {
-    if (isClient) {
-      try {
-        const storedStudents = window.localStorage.getItem(LOCAL_STORAGE_KEY);
-        if (storedStudents) {
-          setStudents(JSON.parse(storedStudents));
-        }
-      } catch (error) {
-        console.error("Gagal memuat data dari localStorage", error);
+    try {
+      const storedStudents = window.localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (storedStudents) {
+        setStudents(JSON.parse(storedStudents));
       }
+    } catch (error) {
+      console.error("Gagal memuat data dari localStorage", error);
     }
-  }, [isClient]);
+  }, []);
 
 
   useEffect(() => {
@@ -236,6 +231,10 @@ export function StudentDataClient({
     URL.revokeObjectURL(url);
     toast({ title: "Template Diunduh", description: "Template import siswa telah diunduh." });
   };
+
+  if (!isClient) {
+    return null; // Atau tampilkan UI loading skeleton
+  }
   
   return (
     <div className="space-y-6">
@@ -524,5 +523,3 @@ export function StudentDataClient({
     </div>
   );
 }
-
-    
